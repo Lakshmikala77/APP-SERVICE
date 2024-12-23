@@ -1,5 +1,9 @@
-# Description
+# **Description**
 please provide the details for the deployment variables below:
+
+## Environment tags
+Environment             variables               value
+Dev                     dev_var                 uyu8789
 
 # Deployment Variables
 - Variable1: []
@@ -16,4 +20,4 @@ please provide the details for the deployment variables below:
 - [] PR5
 
 ## Additional Comments
-[Add any comments here
+[Add any comments here]
