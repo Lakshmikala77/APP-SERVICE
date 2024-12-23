@@ -1,33 +1,40 @@
-name: Update PR Description with Env Variables
+name: Update PR Description with Environment Variables
 
 on:
-    pull_request:
-        types: [opened, edited]
+  pull_request:
+    types: [opened, edited]
+
 jobs:
-    update-pr-description:
-        runs-on: ubuntu-latest
-        steps:
-            - name: check out the repository
-              uses: actions/checkout@v3
-            - name: Extract environment variables values
-              env:
-                dev_var:$
-                {{secreats.Dev_Var_1}}
-            run: |
-                echo "dev_var=${dev_var}" >>
-                 $Github_Env
+  update-pr-description:
+    runs-on: ubuntu-latest
 
-            - name: Update PR description
-              uses: actions-ecosystem/action-update-comment@v1
-              with: 
-                comment-id:$
-                {{github.event.pull_request.node_id}}
-                body: |
-                    ## **Description**
-                    please provide the details for the deployment variables below:
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
 
-                    ## Environment tags
-                    Environment             variables               value
-                    Dev                     dev_var                 uyu8789
+      - name: Extract environment variable values
+        env:
+          DEV_VAR_1: ${{ secrets.DEV_VAR_1 }}
+          QA_VAR_2: ${{ secrets.QA_VAR_2 }}
+          PROD_VAR_3: ${{ secrets.PROD_VAR_3 }}
+        run: |
+          echo "DEV_VAR_1=${DEV_VAR_1}" >> $GITHUB_ENV
+          echo "QA_VAR_2=${QA_VAR_2}" >> $GITHUB_ENV
+          echo "PROD_VAR_3=${PROD_VAR_3}" >> $GITHUB_ENV
 
+      - name: Update PR Description
+        uses: actions-ecosystem/action-update-comment@v1
+        with:
+          comment-id: ${{ github.event.pull_request.node_id }}
+          body: |
+            ## Description
+            Please describe the changes in this PR.
 
+            ## Environment Tags
+            | Environment | Variable | Value |
+            |-------------|----------|-------|
+            | DEV         | VAR_1    | ${{ env.DEV_VAR_1 }} |
+            | QA          | VAR_2    | ${{ env.QA_VAR_2 }} |
+            | PROD        | VAR_3    | ${{ env.PROD_VAR_3 }} |
+
+            **Note**: Replace the placeholder values with actual values as needed.
