@@ -23,9 +23,9 @@ jobs:
           echo "PROD_VAR_3=${PROD_VAR_3}" >> $GITHUB_ENV
 
       - name: Update PR Description
-        uses: actions-ecosystem/action-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v1
         with:
-          comment-id: ${{ github.event.pull_request.node_id }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             ## Description
             Please describe the changes in this PR.
