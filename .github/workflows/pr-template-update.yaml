@@ -1,0 +1,33 @@
+name: Update PR Description with Env Variables
+
+on:
+    pull_request:
+        types: [opened, edited]
+jobs:
+    update-pr-description:
+        runs-on: ubuntu-latest
+        steps:
+            - name: check out the repository
+              uses: actions/checkout@v3
+            - name: Extract environment variables values
+              env:
+                dev_var:$
+                {{secreats.Dev_Var_1}}
+            run: |
+                echo "dev_var=${dev_var}" >>
+                 $Github_Env
+
+            - name: Update PR description
+              uses: actions-ecosystem/action-update-comment@v1
+              with: 
+                comment-id:$
+                {{github.event.pull_request.node_id}}
+                body: |
+                    ## **Description**
+                    please provide the details for the deployment variables below:
+
+                    ## Environment tags
+                    Environment             variables               value
+                    Dev                     dev_var                 uyu8789
+
+
