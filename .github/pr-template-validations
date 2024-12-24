@@ -1,0 +1,315 @@
+
+name: Deploy GQL Federated application to GKE with Pull Request in Provisional environment
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened 
+
+env:
+  BRANCH: ${{ github.event.pull_request.base.ref }}
+ 
+jobs:
+  validate_PR_Template_Values:
+    name: Check Template Configurations
+    runs-on: ubuntu-latest
+    outputs:
+      isTemplateValid: ${{ steps.set_output.outputs.isTemplateValid }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Validate PR Template
+        id: validation
+        uses: ./.github/actions/pr-template-validation
+        with:
+          pr_body: ${{ github.event.pull_request.body }}
+
+      - name: Set output variable
+        id: set_output
+        run: echo "::set-output name=isTemplateValid::${{ env.isTemplateValid }}"
+      
+  lint:
+    needs: validate_PR_Template_Values
+    if: needs.validate_PR_Template_Values.outputs.isTemplateValid == 'true'
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installing dependent npm packages
+        uses: ./.github/actions/installing_packages
+
+      - name: Linting
+        run: npm run lint
+        shell: bash
+
+  tests_coverage:
+    needs: lint
+    name: Test Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout code
+        uses: ./.github/actions/test_coverage
+
+  #Apollo check for provisional
+  apollo-check-provisional:
+    needs: [lint, tests_coverage]
+    name: apollo check provisional
+    runs-on: ubuntu-latest
+    # strategy:
+    #   matrix:
+    #     subgraph:
+    #       ['pr1', 'pr2', 'pr3', 'pr4', 'pr5']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Action for Getting Provisional Environmental Variables
+        uses: ./.github/actions/get-inputs-pr-template
+
+      - name: Apollo check matrix variants
+        uses: ./.github/actions/apollo-check
+        with:
+          graph_ref: puma-federation-nonprod@${{ env.ENVIRONMENT }}
+          apolloKey: ${{secrets.APOLLO_KEY_NONPROD}}
+
+  # Apollo check for development and predevelopment
+  apollo-check-dev-predev:
+    needs: [lint, tests_coverage]
+    name: apollo check dev-predev
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        subgraph:
+          [
+            development-ap,
+            development-eu,
+            development-us,
+            predev-ap,
+            predev-eu,
+            predev-us,
+          ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apollo check matrix variants
+        uses: ./.github/actions/apollo-check
+        with:
+          graph_ref: puma-federation-nonprod@${{ matrix.subgraph }}
+          apolloKey: ${{secrets.APOLLO_KEY_NONPROD}}
+
+  apollo-check-nonProd:
+    needs: [lint, tests_coverage]
+    name: apollo check nonProd
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        subgraph: [staging-ap, staging-eu, staging-us]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apollo check matrix variants
+        uses: ./.github/actions/apollo-check
+        with:
+          graph_ref: puma-federation-nonprod@${{ matrix.subgraph }}
+          apolloKey: ${{secrets.APOLLO_KEY_NONPROD}}
+
+  apollo-check-prod:
+    needs: [lint, tests_coverage]
+    name: apollo check prod
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        subgraph:
+          [
+            preprod-ap,
+            preprod-eu,
+            preprod-us,
+            production-ap,
+            production-eu,
+            production-us,
+          ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apollo check matrix variants
+        uses: ./.github/actions/apollo-check
+        with:
+          graph_ref: puma-federation-prod@${{ matrix.subgraph }}
+          apolloKey: ${{secrets.APOLLO_KEY_PROD}}
+  Build:
+    needs: [apollo-check-provisional]
+    name: Build SubGraph Application
+    runs-on: ubuntu-latest
+ 
+    permissions:
+      contents: read
+      id-token: write
+ 
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # - name: Run Action for Retrieving PR Title
+    #   uses: ./.github/actions/get-pr-title
+    
+    - name: Run Action for Getting Provisional Environmental Variables
+      uses: ./.github/actions/get-inputs-pr-template
+    
+    ### Printing Variables for Testing ###
+    - run: |
+        echo ${{ env.APOLLO_URL }}
+        echo ${{ env.GKE_PROJECT }}
+        echo ${{ env.SUBGRAPH_NAME }}
+        echo ${{ env.NAMESPACE }}
+        echo ${{ env.FAST_SERVICE_ACCOUNT }}
+        echo ${{ env.REGION }}
+
+
+    - name: Run Action for GCP Authentication
+      uses: ./.github/actions/gcp_authentication
+
+  
+    - name: RUn Action for Installing packages
+      uses: ./.github/actions/installing_packages
+
+    ### Docker Image Creation ###
+    - name: Create docker image
+      run:
+        npx nx container ${{env.SUBGRAPH_NAME}} --verbose
+      env:
+        INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    ### Authenticate to Artifact Registry ###
+    - name: Configure Docker CLI
+      run: |
+        gcloud auth list
+        gcloud auth configure-docker ${{ env.GCP_AR_URL }} -q
+    - name: Docker list
+      run: docker images
+
+    ### Docker Image Tag ###
+    - name: Tag Docker image
+      run: |
+        docker tag ${{ env.DEPLOYMENT_NAME }}:latest ${{ env.GCP_AR_URL }}/${{ env.NAMESPACE }}/graphqlfederation-${{ env.DEPLOYMENT_NAME }}:${{ env.VERSION_NUMBER }}
+        docker tag ${{ env.DEPLOYMENT_NAME }}:latest ${{ env.GCP_AR_URL }}/${{ env.NAMESPACE }}/graphqlfederation-${{ env.DEPLOYMENT_NAME }}:latest
+       
+    ### Pubishing Image to AR ###
+    - name: Push Docker image
+      run: |
+        gcloud auth configure-docker us-east4-docker.pkg.dev
+        docker push ${{ env.GCP_AR_URL }}/${{ env.NAMESPACE }}/graphqlfederation-${{ env.DEPLOYMENT_NAME }}:${{env.VERSION_NUMBER}}
+        docker push ${{ env.GCP_AR_URL }}/${{ env.NAMESPACE }}/graphqlfederation-${{ env.DEPLOYMENT_NAME }}:latest
+       
+  Deploy:
+    name: Deploy SubGraph Application to Cluster
+    runs-on: ubuntu-latest
+    needs: Build
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Action for Getting $BRANCH  Environmental Variables
+        uses: ./.github/actions/get-inputs-pr-template
+        
+      - name: Run Action for GCP Authentication
+        uses: ./.github/actions/gcp_authentication
+        id: gcp-auth
+
+      - id: 'get-credentials'
+        name: Set up GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_REGION }}
+          project_id: ${{env.GKE_PROJECT}}
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4.2.0
+        with:
+          version: 'latest'
+        id: install
+
+      ## Set Up Helm dependency ###
+      - name: Setup Helm dependency
+        run: |
+          cd helm/
+          echo "GITHUB_WORKSPACE = ${{ github.workspace }}"
+          echo "Current directory: $(pwd)"
+          helm dependency build ./${{ env.DEPLOYMENT_NAME }}
+
+      # helm dry run and check for provisional prior to helm upgrade
+      - name: Helm dry run provisional
+        id: helm_dry_run_provisional    
+        run: |    
+          cd helm/            
+          helm install ${{ env.DEPLOYMENT_NAME }}-${{ env.ENVIRONMENT }} ./${{ env.DEPLOYMENT_NAME }} --namespace=${{ env.NAMESPACE }} --values ./${{ env.DEPLOYMENT_NAME }}/${{ env.REGION }}/values.${{ env.ENVIRONMENT }}.yaml --dry-run --debug
+        continue-on-error: false 
+
+      - name: Check dry run result of dev
+        if: ${{ steps.helm_dry_run_provisional.outcome != 'success' }}
+        run: echo "Dry run failed for provisional. Please check the logs and fix the issues."
+        continue-on-error: false           
+          
+      ### Deploy Manifest files to GKE Cluster using Helm ###
+      - name: Deploy using Helm in ${{ env.NAMESPACE }} namespace
+        if: ${{ steps.helm_dry_run_provisional.outcome == 'success' }}       
+        run: |
+          cd helm/
+          echo "helm Dry run successful for predev, proceeding to next step."          
+          # helm template ${{ env.DEPLOYMENT_NAME }}-${{ env.ENVIRONMENT }} ./${{ env.DEPLOYMENT_NAME }} --namespace=${{ env.NAMESPACE }} --values ./${{ env.DEPLOYMENT_NAME }}/${{ env.REGION }}/values.${{ env.ENVIRONMENT }}.yaml
+          helm upgrade --install ${{ env.DEPLOYMENT_NAME }}-${{ env.ENVIRONMENT }} ./${{ env.DEPLOYMENT_NAME }} \
+            --wait --atomic \
+            --namespace=${{ env.NAMESPACE }} \
+            --set image.tag=${{ env.TAG }} \
+            --values ./${{ env.DEPLOYMENT_NAME }}/${{env.REGION }}/values.${{ env.ENVIRONMENT }}.yaml
+          if [[ ${{ env.TAG }} == 'latest' ]]; then
+            kubectl rollout restart deployments/${{ env.DEPLOYMENT_NAME }}-${{ env.ENVIRONMENT }} -n ${{ env.NAMESPACE }}
+          fi 
+
+  Apollo-Push:
+    name: Deploy SubGraph Application to Apollo Push
+    runs-on: ubuntu-latest
+    needs: Deploy
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Action for Getting ${{ env.BRANCH }}  Environmental Variables
+        uses: ./.github/actions/get-inputs-pr-template
+
+      - name: Run Action for Apollo Push Variables
+        uses: ./.github/actions/apollo-push-inputs-provisional
+        with:
+          apollo_key_nonprod: ${{ secrets.APOLLO_KEY_NONPROD }}
+          apollo_key_prod: ${{ secrets.APOLLO_KEY_PROD }}
+            
+      ### Printing Variables for Testing ###
+      - run: |
+          echo ${{ env.APOLLO_URL }}
+          echo ${{ env.GKE_PROJECT }}
+          echo ${{ env.SUBGRAPH_NAME }}
+          echo ${{ env.NAMESPACE }}
+          echo ${{ env.FAST_SERVICE_ACCOUNT }}
+          echo ${{ env.REGION }}
+
+      - uses: ./.github/actions/apollo_push
+        with:
+          graphRef: ${{ env.GRAPHREF }}
+          apolloKey: ${{ env.APOLLO_KEY_VAR }}
+          url: ${{ env.APOLLO_URL }}
+
+
+  Delete-skipped-work-items:
+    needs: lint
+    uses: ./.github/workflows/graphql-delete-skipped-workflowruns.yaml
+    secrets: inherit
