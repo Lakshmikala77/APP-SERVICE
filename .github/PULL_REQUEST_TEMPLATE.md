@@ -1,31 +1,23 @@
-## Description
+# Description
+please provide the details for the deployment variables below:
 
-Please fill in the below details to trigger a deployment.
+## Environment tags
+Environment             variables               value
+Dev                     dev_var                 uyu8789
 
-## Deploy to below environment
+# Deployment Variables
+- Variable1: []
+- Variable2: []
+- Variable3: []
+- Variable4: []
+- Variable5: []
 
-- [ ] PR1
-- [ ] PR2
-- [ ] PR3
-- [ ] PR4
-- [ ] PR5
-- [ ] Dev
+## Checklist
+- [] PR1
+- [] PR2
+- [] PR3
+- [] PR4
+- [] PR5
 
-## Deploy to below Regions
-
-- [ ] US
-- [ ] EU
-- [ ] AP
-
-
-## Deploy the below subgraphs
-
-- [ ] RecommendationGraph
-- [ ] SearchGraph
-- [ ] Other subgraph etc
-
-
-## Tags to deploy for each subgraph. Latest tag will be considered for each subgraph as default.
-
-Recommendation Graph : tag = latest TAG
-Other subgraphs etc: tag = latest TAG
+## Additional Comments
+[Add any comments here]
