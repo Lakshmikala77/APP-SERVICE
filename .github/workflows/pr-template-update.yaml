@@ -25,7 +25,7 @@ jobs:
       - name: Update PR Description
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             ## Description
@@ -35,7 +35,7 @@ jobs:
             | Environment | Variable | Value |
             |-------------|----------|-------|
             | DEV         | VAR_1    | ${{ env.DEV_VAR_1 }} |
-            | QA          | VAR_2    | ${{ env.QA_VAR_2 }} |
+            | STG         | VAR_2    | ${{ env.STG_VAR_2 }} |
             | PROD        | VAR_3    | ${{ env.PROD_VAR_3 }} |
 
-            
+           
