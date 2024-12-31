@@ -2,15 +2,14 @@
 please provide the details for the deployment variables below:
 
 ## Environment tags
-Environment             variables               value
-Dev                     dev_var                 uyu8789
+## Environment Tags
+| Environment | Variable | Value |
+|-------------|----------|-------|
+| DEV         | VAR_1    | ${{ env.DEV_VAR_1 }} |
+| STAGE       | VAR_2    | ${{ env.STG_VAR_2 }} |
+| PROD        | VAR_3    | ${{ env.PROD_VAR_3 }} |
 
-# Deployment Variables
-- Variable1: []
-- Variable2: []
-- Variable3: []
-- Variable4: []
-- Variable5: []
+
 
 ## Checklist
 - [] PR1
@@ -19,5 +18,3 @@ Dev                     dev_var                 uyu8789
 - [] PR4
 - [] PR5
 
-## Additional Comments
-[Add any comments here]
