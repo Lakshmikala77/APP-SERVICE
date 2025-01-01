@@ -15,8 +15,8 @@ please provide the details for the deployment variables below::
 <!-- # Deployment Configuration
 
 ## Instructions:
-- Please enter the image tag values for the environments and regions below.
-- If a value is not provided, the default from the repository variables will be used.
+#- Please enter the image tag values for the environments and regions below.
+#- If a value is not provided, the default from the repository variables will be used.
 
 ### Environment Tags
 | Environment | Region | Image Tag Value |
@@ -35,40 +35,89 @@ please provide the details for the deployment variables below::
 | PROD        | AP     | `<Enter value>` |
 
 ## Example
-```markdown
-DEV - US: image-tag-dev-us
-STG - EU: image-tag-stg-eu
-PROD - AP: image-tag-prod-ap --> -->
+#```markdown
+#DEV - US: image-tag-dev-us
+#STG - EU: image-tag-stg-eu
+#PROD - AP: image-tag-prod-ap --> -->
 
 
 ## Description
 
-Please fill in the below details to trigger a deployment.
+#Please fill in the below details to trigger a deployment.
 
 ## Deploy to below environment
 
-- [ ] PR1
-- [ ] PR2
-- [ ] PR3
-- [ ] PR4
-- [ ] PR5
-- [ ] Dev
+#- [ ] PR1
+#- [ ] PR2
+#- [ ] PR3
+#- [ ] PR4
+#- [ ] PR5
+#- [ ] Dev
 
 ## Deploy to below Regions
 
-- [ ] US
-- [ ] EU
-- [ ] AP
+#- [ ] US
+#- [ ] EU
+#- [ ] AP
 
 
 ## Deploy the below subgraphs
 
-- [ ] RecommendationGraph
-- [ ] SearchGraph
-- [ ] Other subgraph etc
+#- [ ] RecommendationGraph
+#- [ ] SearchGraph
+#- [ ] Other subgraph etc
 
 
 ## Tags to deploy for each subgraph. Latest tag will be considered for each subgraph as default.
 
-Recommendation Graph : tag = latest TAG
+#Recommendation Graph : tag = latest TAG
+## Deployment Configuration
+
+### Select Environments for Deployment
+- [ ] DEV
+- [ ] STAGING
+- [ ] PREPROD
+- [ ] PROD
+
+### Image Tags per Region
+
+#### DEV Environment
+- US: `<enter image tag here>`  
+- EU: `<enter image tag here>`  
+- AP: `<enter image tag here>`  
+
+#### STAGING Environment
+- US: `<enter image tag here>`  
+- EU: `<enter image tag here>`  
+- AP: `<enter image tag here>`  
+
+#### PREPROD Environment
+- US: `<enter image tag here>`  
+- EU: `<enter image tag here>`  
+- AP: `<enter image tag here>`  
+
+#### PROD Environment
+- US: `<enter image tag here>`  
+- EU: `<enter image tag here>`  
+- AP: `<enter image tag here>`  
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Other subgraphs etc: tag = latest TAG
