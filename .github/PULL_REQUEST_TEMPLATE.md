@@ -7,7 +7,7 @@ please provide the details for the deployment variables below::
 |-------------|----------|-------|
 | DEV         | VAR_1    | ${{ env.DEV_VAR_1 }} |
 | STAGE       | VAR_2    | ${{ env.STG_VAR_2 }} |
-| PROD        | VAR_3    | ${{ env.PROD_VAR_3 }} | -->
+| PROD        | VAR_3    | ${{ env.PROD_VAR_3 }} | 
 
 
 
@@ -69,7 +69,7 @@ please provide the details for the deployment variables below::
 
 
 ## Tags to deploy for each subgraph. Latest tag will be considered for each subgraph as default.
-
+-->
 #Recommendation Graph : tag = latest TAG
 ## Deployment Configuration
 
