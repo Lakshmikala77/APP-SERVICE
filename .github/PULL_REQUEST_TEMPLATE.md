@@ -11,10 +11,5 @@ please provide the details for the deployment variables below:
 
 
 
-## Checklist
-- [] PR1
-- [] PR2
-- [] PR3
-- [] PR4
-- [] PR5
+
 
