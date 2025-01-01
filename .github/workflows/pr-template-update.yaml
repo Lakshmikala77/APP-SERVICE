@@ -1,40 +1,51 @@
-name: Update PR Description with Environment Variables
+
+---
+
+### **Step 2: GitHub Action Workflow**
+
+Here’s how to extract the values from the PR description dynamically and use them in subsequent steps.
+
+Create a file `.github/workflows/deploy.yaml`:
+
+```yaml
+name: Dynamic Deployment
 
 on:
   pull_request:
     types: [opened, edited]
 
 jobs:
-  update-pr-description:
+  extract-inputs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v3
+    - name: Check out the code
+      uses: actions/checkout@v3
 
-      - name: Extract environment variable values
-        env:
-          DEV_VAR_1: ${{ secrets.DEV_VAR_1 }}
-          STG_VAR_2: ${{ secrets.STG_VAR_2 }}
-          PROD_VAR_3: ${{ secrets.PROD_VAR_3 }}
-        run: |
-          echo "DEV_VAR_1=${DEV_VAR_1}" >> $GITHUB_ENV
-          echo "STG_VAR_2=${STG_VAR_2}" >> $GITHUB_ENV
-          echo "PROD_VAR_3=${PROD_VAR_3}" >> $GITHUB_ENV
+    - name: Extract PR Description Inputs
+      id: extract-inputs
+      run: |
+        echo "Extracting PR inputs..."
+        PR_BODY=$(jq -r '.pull_request.body' < "$GITHUB_EVENT_PATH")
+        echo "PR_BODY=$PR_BODY"
+        
+        # Extract values dynamically (example for DEV-US)
+        DEV_US=$(echo "$PR_BODY" | grep "DEV - US:" | awk -F':' '{print $2}' | xargs)
+        echo "DEV_US=$DEV_US"
 
-      - name: Update PR Description
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          token: ${{ secrets.GH_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            
+        # Export variables
+        echo "DEV_US=$DEV_US" >> $GITHUB_ENV
 
-            ## Environment Tags
-            | Environment | Variable | Value |
-            |-------------|----------|-------|
-            | DEV         | VAR_1    | ${{ env.DEV_VAR_1 }} |
-            | STG         | VAR_2    | ${{ env.STG_VAR_2 }} |
-            | PROD        | VAR_3    | ${{ env.PROD_VAR_3 }} |
+    - name: Display Extracted Variables
+      run: |
+        echo "DEV-US Image Tag: $DEV_US"
 
-           
+  deploy:
+    needs: extract-inputs
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy with Extracted Inputs
+      run: |
+        echo "Using DEV-US Image Tag: $DEV_US"
+        # Add deployment logic here
