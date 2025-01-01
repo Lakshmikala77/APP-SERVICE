@@ -17,6 +17,7 @@
 #       run: |
 #         # Fetch PR body
 #         PR_BODY=$(jq -r '.pull_request.body' < "$GITHUB_EVENT_PATH")
+#         echo "PR_BODY=$PR_BODY"
         
 #         # Extract image tag values
 #         declare -A TAGS
