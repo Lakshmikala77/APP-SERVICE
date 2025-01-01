@@ -1,7 +1,7 @@
 # Description
 please provide the details for the deployment variables below:
 
-## Environment tags
+
 ## Environment Tags
 | Environment | Variable | Value |
 |-------------|----------|-------|
