@@ -1,4 +1,61 @@
-name: Deploy Based on PR Input
+# name: Deploy Based on PR Input
+
+# on:
+#   pull_request:
+#     types: [opened, edited]
+
+# jobs:
+#   extract-and-deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout Code
+#       uses: actions/checkout@v3
+
+#     - name: Extract User Input from PR Description
+#       id: extract-input
+#       run: |
+#         # Fetch PR body
+#         PR_BODY=$(jq -r '.pull_request.body' < "$GITHUB_EVENT_PATH")
+        
+#         # Extract image tag values
+#         declare -A TAGS
+#         for ENV_REGION in DEV-US DEV-EU DEV-AP STG-US STG-EU STG-AP PREPROD-US PREPROD-EU PREPROD-AP PROD-US PROD-EU PROD-AP; do
+#           VALUE=$(echo "$PR_BODY" | grep "${ENV_REGION}:" | awk -F':' '{print $2}' | xargs)
+#           if [ -n "$VALUE" ]; then
+#             TAGS[$ENV_REGION]=$VALUE
+#           fi
+#         done
+
+#         # Save the extracted values as environment variables
+#         for key in "${!TAGS[@]}"; do
+#           echo "${key}=${TAGS[$key]}" >> $GITHUB_ENV
+#         done
+
+#         # Log the extracted values for debugging
+#         echo "Extracted Image Tags:"
+#         for key in "${!TAGS[@]}"; do
+#           echo "$key=${TAGS[$key]}"
+#         done
+
+#     - name: Deploy Specific Regions
+#       run: |
+#         echo "Starting deployment for provided regions..."
+#         for ENV_REGION in DEV-US DEV-EU DEV-AP STG-US STG-EU STG-AP PREPROD-US PREPROD-EU PREPROD-AP PROD-US PROD-EU PROD-AP; do
+#           VALUE=${{ env.${ENV_REGION} }}
+#           if [ -n "$VALUE" ]; then
+#             echo "Deploying to $ENV_REGION with image tag: $VALUE"
+#             # Example: Call your deployment script or API here
+#             ./deploy.sh "$ENV_REGION" "$VALUE"
+#           else
+#             echo "No input provided for $ENV_REGION. Skipping."
+#           fi
+#         done
+
+
+
+
+
 
 on:
   pull_request:
@@ -18,36 +75,59 @@ jobs:
         # Fetch PR body
         PR_BODY=$(jq -r '.pull_request.body' < "$GITHUB_EVENT_PATH")
         
-        # Extract image tag values
+        # Extract selected environments
+        DEPLOY_ENVS=$(echo "$PR_BODY" | grep -E '^- \[x\]' | awk '{print $2}')
+        
+        echo "Selected Environments: $DEPLOY_ENVS"
+
+        # Initialize tags
         declare -A TAGS
-        for ENV_REGION in DEV-US DEV-EU DEV-AP STG-US STG-EU STG-AP PREPROD-US PREPROD-EU PREPROD-AP PROD-US PROD-EU PROD-AP; do
-          VALUE=$(echo "$PR_BODY" | grep "${ENV_REGION}:" | awk -F':' '{print $2}' | xargs)
+
+        # Loop through all region-environment combinations
+        for ENV_REGION in DEV-US DEV-EU DEV-AP STAGING-US STAGING-EU STAGING-AP PREPROD-US PREPROD-EU PREPROD-AP PROD-US PROD-EU PROD-AP; do
+          VALUE=$(echo "$PR_BODY" | grep "$ENV_REGION:" | awk -F':' '{print $2}' | xargs)
           if [ -n "$VALUE" ]; then
             TAGS[$ENV_REGION]=$VALUE
           fi
         done
 
-        # Save the extracted values as environment variables
+        # Save tags as environment variables
         for key in "${!TAGS[@]}"; do
           echo "${key}=${TAGS[$key]}" >> $GITHUB_ENV
         done
 
-        # Log the extracted values for debugging
-        echo "Extracted Image Tags:"
-        for key in "${!TAGS[@]}"; do
-          echo "$key=${TAGS[$key]}"
-        done
-
-    - name: Deploy Specific Regions
+    - name: Deploy Selected Regions
       run: |
-        echo "Starting deployment for provided regions..."
-        for ENV_REGION in DEV-US DEV-EU DEV-AP STG-US STG-EU STG-AP PREPROD-US PREPROD-EU PREPROD-AP PROD-US PROD-EU PROD-AP; do
+        echo "Starting deployment for selected regions..."
+        for ENV_REGION in DEV-US DEV-EU DEV-AP STAGING-US STAGING-EU STAGING-AP PREPROD-US PREPROD-EU PREPROD-AP PROD-US PROD-EU PROD-AP; do
           VALUE=${{ env.${ENV_REGION} }}
           if [ -n "$VALUE" ]; then
-            echo "Deploying to $ENV_REGION with image tag: $VALUE"
-            # Example: Call your deployment script or API here
+            echo "Deploying $ENV_REGION with image tag: $VALUE"
             ./deploy.sh "$ENV_REGION" "$VALUE"
           else
-            echo "No input provided for $ENV_REGION. Skipping."
+            echo "No tag provided for $ENV_REGION. Skipping."
           fi
         done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
