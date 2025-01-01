@@ -1,51 +1,53 @@
-
----
-
-### **Step 2: GitHub Action Workflow**
-
-Here’s how to extract the values from the PR description dynamically and use them in subsequent steps.
-
-Create a file `.github/workflows/deploy.yaml`:
-
-```yaml
-name: Dynamic Deployment
+name: Deploy Based on PR Input
 
 on:
   pull_request:
     types: [opened, edited]
 
 jobs:
-  extract-inputs:
+  extract-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out the code
+    - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Extract PR Description Inputs
-      id: extract-inputs
+    - name: Extract User Input from PR Description
+      id: extract-input
       run: |
-        echo "Extracting PR inputs..."
+        # Fetch PR body
         PR_BODY=$(jq -r '.pull_request.body' < "$GITHUB_EVENT_PATH")
-        echo "PR_BODY=$PR_BODY"
         
-        # Extract values dynamically (example for DEV-US)
-        DEV_US=$(echo "$PR_BODY" | grep "DEV - US:" | awk -F':' '{print $2}' | xargs)
-        echo "DEV_US=$DEV_US"
+        # Extract image tag values
+        declare -A TAGS
+        for ENV_REGION in DEV-US DEV-EU DEV-AP STG-US STG-EU STG-AP PREPROD-US PREPROD-EU PREPROD-AP PROD-US PROD-EU PROD-AP; do
+          VALUE=$(echo "$PR_BODY" | grep "${ENV_REGION}:" | awk -F':' '{print $2}' | xargs)
+          if [ -n "$VALUE" ]; then
+            TAGS[$ENV_REGION]=$VALUE
+          fi
+        done
 
-        # Export variables
-        echo "DEV_US=$DEV_US" >> $GITHUB_ENV
+        # Save the extracted values as environment variables
+        for key in "${!TAGS[@]}"; do
+          echo "${key}=${TAGS[$key]}" >> $GITHUB_ENV
+        done
 
-    - name: Display Extracted Variables
+        # Log the extracted values for debugging
+        echo "Extracted Image Tags:"
+        for key in "${!TAGS[@]}"; do
+          echo "$key=${TAGS[$key]}"
+        done
+
+    - name: Deploy Specific Regions
       run: |
-        echo "DEV-US Image Tag: $DEV_US"
-
-  deploy:
-    needs: extract-inputs
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Deploy with Extracted Inputs
-      run: |
-        echo "Using DEV-US Image Tag: $DEV_US"
-        # Add deployment logic here
+        echo "Starting deployment for provided regions..."
+        for ENV_REGION in DEV-US DEV-EU DEV-AP STG-US STG-EU STG-AP PREPROD-US PREPROD-EU PREPROD-AP PROD-US PROD-EU PROD-AP; do
+          VALUE=${{ env.${ENV_REGION} }}
+          if [ -n "$VALUE" ]; then
+            echo "Deploying to $ENV_REGION with image tag: $VALUE"
+            # Example: Call your deployment script or API here
+            ./deploy.sh "$ENV_REGION" "$VALUE"
+          else
+            echo "No input provided for $ENV_REGION. Skipping."
+          fi
+        done
