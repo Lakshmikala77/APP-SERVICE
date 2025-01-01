@@ -12,7 +12,7 @@ please provide the details for the deployment variables below::
 
 
 
-<!-- # Deployment Configuration
+<!-- # Deployment Configurations
 
 ## Instructions:
 #- Please enter the image tag values for the environments and regions below.
