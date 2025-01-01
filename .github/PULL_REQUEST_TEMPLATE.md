@@ -17,14 +17,6 @@ please provide the details for the deployment variables below:
 ## **Description**
 Provide a brief summary of the changes introduced in this PR.
 
----
-
-## **Related Issue**
-Link to the related issue (if any):  
-`[Issue Number/Link]`
-
----
-
 ## **Deployment Configuration**
 Please provide the image tags for deployment in the respective environments and regions.  
 
