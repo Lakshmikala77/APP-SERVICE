@@ -40,4 +40,6 @@
 - [ ] AP
 
 ## ** Dynalic Image tag Input**
-- Image Tag: `[user input] `
+- US: `[user input] `
+- AP: `[user input] `
+- EU: `[user input] `
