@@ -91,7 +91,7 @@ Image tag: `[Enter image Tag]`
 >>>>>>> e8eea3a3cff438feb1cc9ccf12cfbbfe8e1ff8a2-->
 
 # ** Pull request Title:**
-Deploy to Stage envir
+Deploy to Stage env
 ----
 ## ** The user  provide the image tag values**
 ----
