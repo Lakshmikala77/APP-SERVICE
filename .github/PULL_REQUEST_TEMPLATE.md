@@ -96,7 +96,7 @@ Deploy to Stage env
 ## ** The user  provide the image tag values**
 ----
 
-- **US Region:**
+- **US Region:***
 Image tag: `[enter image tag ]`
 
 - **AP Region:**
