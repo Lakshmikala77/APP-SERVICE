@@ -1,4 +1,4 @@
-## Deployment Configuration
+<!-- ## Deployment Configuration
 
 ### Select Environments for Deployment
 - [ ] DEV
@@ -27,24 +27,17 @@
 - US: `<enter image tag here>`  
 - EU: `<enter image tag here>`  
 - AP: `<enter image tag here>`  
+ -->
+## Deployment Plan
+- [ ] DEV
+- [ ] STAGING
+- [ ] PREPROD
+- [ ] PROD
 
----
+**Regions **
+- [ ] US
+- [ ] EU
+- [ ] AP
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Other subgraphs etc: tag = latest TAG
+** Dynalic Image tag Input**
+- Image Tag: `[user input] `
