@@ -67,7 +67,7 @@ Deploy to Production env
 Image tag: `[enter image tag ]`
 
 - **AP Region:**
-Image tag: `[Enter image Tag]`-->
+Image tag: `[Enter image Tag]`
 
 - **EU Region:**
-Image tag: `[Enter image Tag]`
+Image tag: `[Enter image Tag]`-->
