@@ -2,8 +2,7 @@ pulls:
   branches:
     dev:
       template: PULL_REQUEST_TEMPLATE/dev.md
-    staging:
+    stage:
       template: PULL_REQUEST_TEMPLATE/stage.md
-    production:
-      template: PULL_REQUEST_TEMPLATE/production.md
-  
+    prod:
+      template: PULL_REQUEST_TEMPLATE/prod.md
