@@ -39,7 +39,7 @@
 - [ ] EU
 - [ ] AP
 
-## ** Dynalic Image tag Input**
+## ** Dynamic Image tag Input**
 - US: `[user input] `
 - AP: `[user input] `
 - EU: `[user input] `
