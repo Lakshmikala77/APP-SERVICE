@@ -6,9 +6,9 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
+    branches: [ "dev", "staging", "production", "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "dev", "staging", "production", "main" ]
 jobs:
   lint:
     if: ${{ startsWith(github.event.pull_request.title, 'PR') && github.event.pull_request.merged == true }}
