@@ -1,5 +1,5 @@
 # ** Pull request Title:**
-Deploy to Stage env
+Deploy to Stage envi
 ----
 ## ** The user  provide the image tag values**
 ----
