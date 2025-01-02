@@ -28,7 +28,7 @@
 - EU: `<enter image tag here>`  
 - AP: `<enter image tag here>`  
  -->
-## **Deployment Plan**
+<!-- ## **Deployment Plan**
 - [ ] DEV
 - [ ] STAGING
 - [ ] PREPROD
@@ -42,4 +42,19 @@
 ## ** Dynamic Image tag Input**
 - US: `[user input] `
 - AP: `[user input] `
-- EU: `[user input] `
+- EU: `[user input] ` -->
+# ** Pull request Title:**
+Deploy Dev env
+----
+## ** The user  provide the image tag values**
+----
+- **Dev**
+
+- **US Region:**
+Image tag: `[user input]`
+
+- **AP Region:**
+Image tag: `[user input]`
+
+- **EU Region:**
+Image tag: `[user input]`
