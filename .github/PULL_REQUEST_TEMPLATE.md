@@ -85,7 +85,22 @@ Image tag: `[Enter image Tag]`
 Image tag: `[Enter image Tag]`
 ========
 Image tag: `[Enter image Tag]`
->>>>>>>> ce01e95e50d6eced1d1c84dfe778756f365f3498:.github/PULL_REQUEST_TEMPLA-->
+>>>>>>>> ce01e95e50d6eced1d1c84dfe778756f365f3498:.github/PULL_REQUEST_TEMPLA
 =======
-Image tag: `[Enter image Tag]`-->
->>>>>>> e8eea3a3cff438feb1cc9ccf12cfbbfe8e1ff8a2
+Image tag: `[Enter image Tag]`
+>>>>>>> e8eea3a3cff438feb1cc9ccf12cfbbfe8e1ff8a2-->
+
+# ** Pull request Title:**
+Deploy to Stage envir
+----
+## ** The user  provide the image tag values**
+----
+
+- **US Region:**
+Image tag: `[enter image tag ]`
+
+- **AP Region:**
+Image tag: `[Enter image Tag]`
+
+- **EU Region:**
+Image tag: `[Enter image Tag]`
