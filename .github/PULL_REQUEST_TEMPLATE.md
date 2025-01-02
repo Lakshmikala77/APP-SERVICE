@@ -28,16 +28,16 @@
 - EU: `<enter image tag here>`  
 - AP: `<enter image tag here>`  
  -->
-## Deployment Plan
+## **Deployment Plan**
 - [ ] DEV
 - [ ] STAGING
 - [ ] PREPROD
 - [ ] PROD
 
-**Regions **
+## **Regions **
 - [ ] US
 - [ ] EU
 - [ ] AP
 
-** Dynalic Image tag Input**
+## ** Dynalic Image tag Input**
 - Image Tag: `[user input] `
