@@ -51,7 +51,7 @@ Deploy Dev env
 - **Dev**
 
 - **US Region:**
-Image tag: `[user input]`
+Image tag: `[enter image tag ]`
 
 - **AP Region:**
 Image tag: `[user input]`
