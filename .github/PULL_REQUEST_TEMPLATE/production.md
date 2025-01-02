@@ -1,5 +1,5 @@
 # ** Pull request Title:**
-Deploy to Prodcution env
+Deploy to Production env
 ----
 ## ** The user  provide the image tag values**
 ----
