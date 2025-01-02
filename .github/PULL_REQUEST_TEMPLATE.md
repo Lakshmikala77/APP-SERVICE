@@ -44,14 +44,13 @@
 - AP: `[user input] `
 - EU: `[user input] ` -->
 # ** Pull request Title:**
-Deploy Dev env
+Deploy to Dev env
 ----
 ## ** The user  provide the image tag values**
 ----
-- **Dev**
 
 - **US Region:**
-Image tag: `[user input]`
+Image tag: `[enter image tag ]`
 
 - **AP Region:**
 Image tag: `[user input]`
